@@ -1,18 +1,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.verdelhan</groupId>
-    <artifactId>ta4j-parent</artifactId>
+    <artifactId>ta4k-parent</artifactId>
     <version>0.10-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>Ta4j Parent</name>
-    <description>ta4j is a Java library providing a simple API for technical analysis.</description>
-    <url>http://github.com/mdeverdelhan/ta4j</url>
+    <name>Ta4k Parent</name>
+    <description>ta4k is a Java/Kotlin library providing a simple API for technical analysis.</description>
+    <url>https://github.com/mgrzaslewicz/ta4j-autocoin</url>
     <inceptionYear>2014</inceptionYear>
 
     <developers>
         <developer>
             <name>Marc de Verdelhan</name>
+        </developer>
+        <developer>
+            <name>Mikolaj Grzaslewicz</name>
         </developer>
     </developers>
 
@@ -25,7 +28,7 @@
 
     <issueManagement>
         <system>GitHub</system>
-        <url>http://github.com/mdeverdelhan/ta4j/issues</url>
+        <url>https://github.com/mgrzaslewicz/ta4j-autocoin/issues</url>
     </issueManagement>
 
     <distributionManagement>
@@ -42,19 +45,19 @@
     </distributionManagement>
 
     <ciManagement>
-        <url>http://travis-ci.org/mdeverdelhan/ta4j</url>
+        <url>http://travis-ci.org/mdeverdelhan/ta4k</url>
     </ciManagement>
 
     <scm>
-        <connection>scm:git:git://github.com/mdeverdelhan/ta4j.git</connection>
-        <developerConnection>scm:git:git@github.com:mdeverdelhan/ta4j.git</developerConnection>
-        <url>http://github.com/mdeverdelhan/ta4j</url>
+        <connection>scm:git:git://github.com/mgrzaslewicz/ta4k.git</connection>
+        <developerConnection>scm:git:git@github.com:mgrzaslewicz/ta4k.git</developerConnection>
+        <url>http://github.com/mgrzaslewicz/ta4k</url>
         <tag>HEAD</tag>
     </scm>
 
     <modules>
-        <module>ta4j</module>
-        <module>ta4j-examples</module>
+        <module>ta4k</module>
+        <module>ta4k-examples</module>
     </modules>
 
     <properties>

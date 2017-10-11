@@ -2,13 +2,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>eu.verdelhan</groupId>
-        <artifactId>ta4j-parent</artifactId>
+        <artifactId>ta4k-parent</artifactId>
         <version>0.10-SNAPSHOT</version>
     </parent>
-    <artifactId>ta4j</artifactId>
+    <artifactId>ta4k</artifactId>
 
-    <name>ta4j</name>
-    <description>ta4j is a Java library providing a simple API for technical analysis.</description>
+    <name>ta4k</name>
+    <description>ta4k is a Java/Kotlin library providing a simple API for technical analysis.</description>
 
     <dependencies>
 

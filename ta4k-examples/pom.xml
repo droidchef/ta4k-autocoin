@@ -2,19 +2,19 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>eu.verdelhan</groupId>
-        <artifactId>ta4j-parent</artifactId>
+        <artifactId>ta4k-parent</artifactId>
         <version>0.10-SNAPSHOT</version>
     </parent>
-    <artifactId>ta4j-examples</artifactId>
+    <artifactId>ta4k-examples</artifactId>
 
-    <name>Ta4j Examples</name>
-    <description>Provides examples that demonstrate how to use ta4j</description>
+    <name>Ta4k Examples</name>
+    <description>Provides examples that demonstrate how to use ta4k</description>
 
     <dependencies>
         
         <dependency>
             <groupId>eu.verdelhan</groupId>
-            <artifactId>ta4j</artifactId>
+            <artifactId>ta4k</artifactId>
             <version>0.10-SNAPSHOT</version>
         </dependency>
 
