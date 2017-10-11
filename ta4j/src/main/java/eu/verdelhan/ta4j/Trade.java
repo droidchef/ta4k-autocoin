@@ -23,29 +23,31 @@
 package eu.verdelhan.ta4j;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import eu.verdelhan.ta4j.Order.OrderType;
 
 /**
- * Pair of two {@link Order orders}.
+ * Set of BUY (or SELL) {@link Order orders} followed by complementary SELL (or BUY) orders.
  * <p>
- * The exit order has the complement type of the entry order.<br>
+ * The exits order has the complement type of the entries order.<br>
  * I.e.:
- *   entry == BUY --> exit == SELL
- *   entry == SELL --> exit == BUY
+ *   entries == BUY, BUY... --> exits == SELL, SELL...
+ *   entries == SELL, SELL... --> exits == BUY, BUY...
  */
 public class Trade implements Serializable {
 
 	private static final long serialVersionUID = -5484709075767220358L;
 
-	/** The entry order */
-    private Order entry;
+	/** The entries order */
+    private final List<Order> entries = new ArrayList();
 
-    /** The exit order */
-    private Order exit;
+    /** The exits order */
+    private  List<Order> exits = new ArrayList();
 
-    /** The type of the entry order */
+    /** The type of the entries order */
     private OrderType startingType;
 
     /**
@@ -57,7 +59,7 @@ public class Trade implements Serializable {
 
     /**
      * Constructor.
-     * @param startingType the starting {@link OrderType order type} of the trade (i.e. type of the entry order)
+     * @param startingType the starting {@link OrderType order type} of the trade (i.e. type of the entries order)
      */
     public Trade(OrderType startingType) {
         if (startingType == null) {
@@ -76,36 +78,44 @@ public class Trade implements Serializable {
             throw new IllegalArgumentException("Both orders must have different types");
         }
         this.startingType = entry.getType();
-        this.entry = entry;
-        this.exit = exit;
+        entries.add(entry);
+        exits.add(exit);
     }
 
     /**
-     * @return the entry {@link Order order} of the trade
+     * @return the entries {@link Order order} of the trade
      */
     public Order getEntry() {
-        return entry;
+        if (entries.isEmpty()) {
+            return null;
+        } else {
+            return entries.get(0);
+        }
     }
 
     /**
-     * @return the exit {@link Order order} of the trade
+     * @return the exits {@link Order order} of the trade
      */
     public Order getExit() {
-        return exit;
+        if (exits.isEmpty()) {
+            return null;
+        } else {
+            return exits.get(0);
+        }
     }
 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Trade) {
             Trade t = (Trade) obj;
-            return entry.equals(t.getEntry()) && exit.equals(t.getExit());
+            return entries.equals(t.entries) && exits.equals(t.exits);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(entry, exit);
+        return Objects.hash(entries, exits);
     }
 
     /**
@@ -115,6 +125,10 @@ public class Trade implements Serializable {
      */
     public Order operate(int index) {
         return operate(index, Decimal.NaN, Decimal.NaN);
+    }
+
+    private Order firstEntry() {
+        return entries.get(0);
     }
 
     /**
@@ -128,13 +142,13 @@ public class Trade implements Serializable {
         Order order = null;
         if (isNew()) {
             order = new Order(index, startingType, price, amount);
-            entry = order;
+            entries.add(order);
         } else if (isOpened()) {
-            if (index < entry.getIndex()) {
+            if (index < firstEntry().getIndex()) {
                 throw new IllegalStateException("The index i is less than the entryOrder index");
             }
             order = new Order(index, startingType.complementType(), price, amount);
-            exit = order;
+            exits.add(order);
         }
         return order;
     }
@@ -143,25 +157,25 @@ public class Trade implements Serializable {
      * @return true if the trade is closed, false otherwise
      */
     public boolean isClosed() {
-        return (entry != null) && (exit != null);
+        return (!entries.isEmpty()) && (!exits.isEmpty());
     }
 
     /**
      * @return true if the trade is opened, false otherwise
      */
     public boolean isOpened() {
-        return (entry != null) && (exit == null);
+        return (!entries.isEmpty()) && (exits.isEmpty());
     }
 
     /**
      * @return true if the trade is new, false otherwise
      */
     public boolean isNew() {
-        return (entry == null) && (exit == null);
+        return (entries.isEmpty()) && (exits.isEmpty());
     }
 
     @Override
     public String toString() {
-        return "Entry: " + entry + " exit: " + exit;
+        return "Entries: " + entries + " exits: " + exits;
     }
 }
