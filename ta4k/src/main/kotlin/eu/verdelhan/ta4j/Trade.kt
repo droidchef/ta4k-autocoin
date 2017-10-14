@@ -1,6 +1,5 @@
 package eu.verdelhan.ta4j
 
-import eu.verdelhan.ta4j.Order.OrderType
 import java.io.Serializable
 import java.util.*
 
@@ -38,8 +37,8 @@ class Trade(private val startingType: Order.OrderType = Order.OrderType.BUY): Se
      */
     fun getExit(): Order? = exits.firstOrNull()
 
-    override fun equals(t: Any?): Boolean {
-        return if (t is Trade) entries == t.entries && exits == t.exits
+    override fun equals(other: Any?): Boolean {
+        return if (other is Trade) entries == other.entries && exits == other.exits
         else false
     }
 
