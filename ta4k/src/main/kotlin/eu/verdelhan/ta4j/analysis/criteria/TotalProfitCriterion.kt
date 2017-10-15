@@ -20,38 +20,30 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package eu.verdelhan.ta4j.analysis.criteria;
+package eu.verdelhan.ta4j.analysis.criteria
 
-import eu.verdelhan.ta4j.Decimal;
-import eu.verdelhan.ta4j.TimeSeries;
-import eu.verdelhan.ta4j.Trade;
-import eu.verdelhan.ta4j.TradingRecord;
+import eu.verdelhan.ta4j.Decimal
+import eu.verdelhan.ta4j.TimeSeries
+import eu.verdelhan.ta4j.Trade
+import eu.verdelhan.ta4j.TradingRecord
 
 /**
  * Total profit criterion.
  * <p>
  * The total profit of the provided {@link Trade trade(s)} over the provided {@link TimeSeries series}.
  */
-public class TotalProfitCriterion extends AbstractAnalysisCriterion {
+class TotalProfitCriterion : AbstractAnalysisCriterion() {
 
-    @Override
-    public double calculate(TimeSeries series, TradingRecord tradingRecord) {
-        double value = 1d;
-        for (Trade trade : tradingRecord.getTrades()) {
-            value *= calculateProfit(series, trade);
-        }
-        return value;
+    override fun calculate(series: TimeSeries, tradingRecord: TradingRecord): Double {
+        var value = 1.0
+        tradingRecord.trades.forEach { value *= calculateProfit(series, it) }
+        return value
     }
 
-    @Override
-    public double calculate(TimeSeries series, Trade trade) {
-        return calculateProfit(series, trade);
-    }
+    override fun calculate(series: TimeSeries, trade: Trade) = calculateProfit(series, trade)
 
-    @Override
-    public boolean betterThan(double criterionValue1, double criterionValue2) {
-        return criterionValue1 > criterionValue2;
-    }
+    override fun betterThan(criterionValue1: Double, criterionValue2: Double) =
+            criterionValue1 > criterionValue2
 
     /**
      * Calculates the profit of a trade (Buy and sell).
@@ -59,18 +51,14 @@ public class TotalProfitCriterion extends AbstractAnalysisCriterion {
      * @param trade a trade
      * @return the profit of the trade
      */
-    private double calculateProfit(TimeSeries series, Trade trade) {
-        Decimal profit = Decimal.ONE;
+    private fun calculateProfit(series: TimeSeries, trade: Trade): Double {
+        var profit = Decimal.ONE
         if (trade.isClosed()) {
-            Decimal exitClosePrice = series.getTick(trade.getExit().getIndex()).getClosePrice();
-            Decimal entryClosePrice = series.getTick(trade.getEntry().getIndex()).getClosePrice();
-
-            if (trade.getEntry().isBuy()) {
-                profit = exitClosePrice.dividedBy(entryClosePrice);
-            } else {
-                profit = entryClosePrice.dividedBy(exitClosePrice);
-            }
+            val exitClosePrice = series.getTick(trade.getExit()!!.index).closePrice
+            val entryClosePrice = series.getTick(trade.getEntry()!!.index).closePrice
+            profit = if (trade.getEntry()!!.isBuy) exitClosePrice.dividedBy(entryClosePrice)
+            else entryClosePrice.dividedBy(exitClosePrice)
         }
-        return profit.toDouble();
+        return profit.toDouble()
     }
 }
