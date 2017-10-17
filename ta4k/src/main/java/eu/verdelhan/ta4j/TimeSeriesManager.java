@@ -23,7 +23,6 @@
 package eu.verdelhan.ta4j;
 
 import eu.verdelhan.ta4j.Order.OrderType;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -150,25 +149,38 @@ public class TimeSeriesManager {
         TradingRecord tradingRecord = new BaseTradingRecord(orderType);
         for (int i = runBeginIndex; i <= runEndIndex; i++) {
             // For each tick between both indexes...       
-            if (strategy.shouldOperate(i, tradingRecord)) {
-                tradingRecord.operate(i, timeSeries.getTick(i).getClosePrice(), amount);
+            if (strategy.shouldEnter(i, tradingRecord)) {
+                tradingRecord.enter(i, timeSeries.getTick(i).getClosePrice(), amount);
+            }
+            if (strategy.shouldExit(i, tradingRecord)) {
+                tradingRecord.exit(i, timeSeries.getTick(i).getClosePrice(), amount);
             }
         }
+        closeOpenTrade(tradingRecord, runEndIndex, strategy, amount);
 
+        return tradingRecord;
+    }
+
+    private void closeOpenTrade(TradingRecord tradingRecord, int runEndIndex, Strategy strategy, Decimal amount) {
         if (!tradingRecord.isClosed()) {
             // If the last trade is still opened, we search out of the run end index.
             // May works if the end index for this run was inferior to the actual number of ticks
-        	int seriesMaxSize = Math.max(timeSeries.getEndIndex() + 1, timeSeries.getTickData().size());
+            int seriesMaxSize = Math.max(timeSeries.getEndIndex() + 1, timeSeries.getTickData().size());
             for (int i = runEndIndex + 1; i < seriesMaxSize; i++) {
                 // For each tick after the end index of this run...
                 // --> Trying to close the last trade
-                if (strategy.shouldOperate(i, tradingRecord)) {
-                    tradingRecord.operate(i, timeSeries.getTick(i).getClosePrice(), amount);
+                if (strategy.shouldEnter(i, tradingRecord)) {
+                    tradingRecord.enter(i, timeSeries.getTick(i).getClosePrice(), amount);
+                    tradingRecord.closeCurrent();
+                    break;
+                }
+                if (strategy.shouldExit(i, tradingRecord)) {
+                    tradingRecord.exit(i, timeSeries.getTick(i).getClosePrice(), amount);
+                    tradingRecord.closeCurrent();
                     break;
                 }
             }
         }
-        return tradingRecord;
     }
 
 }

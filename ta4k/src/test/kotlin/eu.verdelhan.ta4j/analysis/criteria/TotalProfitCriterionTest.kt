@@ -31,6 +31,21 @@ class TotalProfitCriterionTest {
 
     private val profit: AnalysisCriterion = TotalProfitCriterion()
 
+//    private fun buyAtWithAmount(series: TimeSeries, index: Int, amount: Int) = Order.buyAt(index, series.getTick(index).closePrice, Decimal.valueOf(amount))
+//
+//    private fun sellAtWithAmount(series: TimeSeries, index: Int, amount: Int) = Order.sellAt(index, series.getTick(index).closePrice, Decimal.valueOf(amount))
+//
+//    @Test
+//    fun calculateWithMultipleBuyOrdersWhenSellingAll() {
+//        val series = MockTimeSeries(100.0, 105.0, 100.0, 110.0, 95.0, 105.0)
+//        val tradingRecord = BaseTradingRecord(
+//                buyAtWithAmount(series, 0, 2),
+//                buyAtWithAmount(series, 2, 1),
+//                sellAtWithAmount(series, 3, 3))
+//
+//        assertEquals(1.10, profit.calculate(series, tradingRecord), TATestsUtils.TA_OFFSET)
+//    }
+
     @Test
     fun calculateOnlyWithGainTrades() {
         val series = MockTimeSeries(100.0, 105.0, 110.0, 100.0, 95.0, 105.0)
@@ -73,7 +88,7 @@ class TotalProfitCriterionTest {
         val series = MockTimeSeries(100.0, 95.0, 100.0, 80.0, 85.0, 70.0)
         val trade = Trade()
         assertEquals(1.0, profit.calculate(series, trade), TATestsUtils.TA_OFFSET)
-        trade.operate(0)
+        trade.enter(0)
         assertEquals(1.0, profit.calculate(series, trade), TATestsUtils.TA_OFFSET)
     }
 

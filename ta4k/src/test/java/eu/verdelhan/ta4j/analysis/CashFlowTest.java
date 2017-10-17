@@ -46,7 +46,7 @@ public class CashFlowTest {
     @Test
     public void cashFlowBuyWithOnlyOneTrade() {
         TimeSeries sampleTimeSeries = new MockTimeSeries(1d, 2d);
-        TradingRecord tradingRecord = new BaseTradingRecord(Order.buyAt(0), Order.sellAt(1));
+        TradingRecord tradingRecord = new BaseTradingRecord(Order.buyAt(0), Order.sellAt(1)).closeCurrent();
 
         CashFlow cashFlow = new CashFlow(sampleTimeSeries, tradingRecord);
 
@@ -59,8 +59,8 @@ public class CashFlowTest {
         TimeSeries sampleTimeSeries = new MockTimeSeries(2, 1, 3, 5, 6, 3, 20);
         TradingRecord tradingRecord = new BaseTradingRecord(
                 Order.buyAt(0), Order.sellAt(1),
-                Order.buyAt(3), Order.sellAt(4),
-                Order.sellAt(5), Order.buyAt(6));
+                Order.buyAt(3), Order.sellAt(4), Order.sellAt(5),
+                Order.buyAt(6));
 
         CashFlow cashFlow = new CashFlow(sampleTimeSeries, tradingRecord);
 
@@ -77,7 +77,7 @@ public class CashFlowTest {
     @Test
     public void cashFlowSell() {
         TimeSeries sampleTimeSeries = new MockTimeSeries(1, 2, 4, 8, 16, 32);
-        TradingRecord tradingRecord = new BaseTradingRecord(Order.sellAt(2), Order.buyAt(3));
+        TradingRecord tradingRecord = new BaseTradingRecord(Order.sellAt(2), Order.buyAt(3)).closeCurrent();
 
         CashFlow cashFlow = new CashFlow(sampleTimeSeries, tradingRecord);
 
@@ -110,7 +110,7 @@ public class CashFlowTest {
     @Test
     public void cashFlowValueWithOnlyOneTradeAndAGapBefore() {
         TimeSeries sampleTimeSeries = new MockTimeSeries(1d, 1d, 2d);
-        TradingRecord tradingRecord = new BaseTradingRecord(Order.buyAt(1), Order.sellAt(2));
+        TradingRecord tradingRecord = new BaseTradingRecord(Order.buyAt(1), Order.sellAt(2)).closeCurrent();
 
         CashFlow cashFlow = new CashFlow(sampleTimeSeries, tradingRecord);
 
@@ -122,7 +122,7 @@ public class CashFlowTest {
     @Test
     public void cashFlowValueWithOnlyOneTradeAndAGapAfter() {
         TimeSeries sampleTimeSeries = new MockTimeSeries(1d, 2d, 2d);
-        TradingRecord tradingRecord = new BaseTradingRecord(Order.buyAt(0), Order.sellAt(1));
+        TradingRecord tradingRecord = new BaseTradingRecord(Order.buyAt(0), Order.sellAt(1)).closeCurrent();
 
         CashFlow cashFlow = new CashFlow(sampleTimeSeries, tradingRecord);
 
@@ -137,7 +137,7 @@ public class CashFlowTest {
         TimeSeries sampleTimeSeries = new MockTimeSeries(1d, 2d, 4d, 8d, 16d, 32d);
         TradingRecord tradingRecord = new BaseTradingRecord(
                 Order.buyAt(1), Order.sellAt(2),
-                Order.buyAt(4), Order.sellAt(5));
+                Order.buyAt(4), Order.sellAt(5)).closeCurrent();
 
         CashFlow cashFlow = new CashFlow(sampleTimeSeries, tradingRecord);
 

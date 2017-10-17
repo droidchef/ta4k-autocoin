@@ -45,22 +45,12 @@ public class CashFlow implements Indicator<Decimal> {
     /** The cash flow values */
     private List<Decimal> values = new ArrayList<Decimal>(Arrays.asList(Decimal.ONE));
 
-    /**
-     * Constructor.
-     * @param timeSeries the time series
-     * @param trade a single trade
-     */
     public CashFlow(TimeSeries timeSeries, Trade trade) {
         this.timeSeries = timeSeries;
         calculate(trade);
         fillToTheEnd();
     }
 
-    /**
-     * Constructor.
-     * @param timeSeries the time series
-     * @param tradingRecord the trading record
-     */
     public CashFlow(TimeSeries timeSeries, TradingRecord tradingRecord) {
         this.timeSeries = timeSeries;
         calculate(tradingRecord);
@@ -88,10 +78,6 @@ public class CashFlow implements Indicator<Decimal> {
         return timeSeries.getTickCount();
     }
 
-    /**
-     * Calculates the cash flow for a single trade.
-     * @param trade a single trade
-     */
     private void calculate(Trade trade) {
         final int entryIndex = trade.getEntry().getIndex();
         int begin = entryIndex + 1;
@@ -111,13 +97,8 @@ public class CashFlow implements Indicator<Decimal> {
         }
     }
 
-    /**
-     * Calculates the cash flow for a trading record.
-     * @param tradingRecord the trading record
-     */
     private void calculate(TradingRecord tradingRecord) {
         for (Trade trade : tradingRecord.getTrades()) {
-            // For each trade...
             calculate(trade);
         }
     }

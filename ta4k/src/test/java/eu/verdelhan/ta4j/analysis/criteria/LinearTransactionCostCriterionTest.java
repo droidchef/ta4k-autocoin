@@ -43,11 +43,11 @@ public class LinearTransactionCostCriterionTest {
         TradingRecord tradingRecord = new BaseTradingRecord(Order.buyAt(0), Order.sellAt(1));
         assertEquals(12.861, transactionCost.calculate(series, tradingRecord), TATestsUtils.TA_OFFSET);
 
-        tradingRecord.operate(2);
-        tradingRecord.operate(3);
+        tradingRecord.enter(2);
+        tradingRecord.exit(3);
         assertEquals(24.3473, transactionCost.calculate(series, tradingRecord), TATestsUtils.TA_OFFSET);
 
-        tradingRecord.operate(5);
+        tradingRecord.enter(5);
         assertEquals(28.2204, transactionCost.calculate(series, tradingRecord), TATestsUtils.TA_OFFSET);
     }
 
@@ -59,11 +59,11 @@ public class LinearTransactionCostCriterionTest {
         TradingRecord tradingRecord = new BaseTradingRecord(Order.buyAt(0), Order.sellAt(1));
         assertEquals(2.6d, transactionCost.calculate(series, tradingRecord), TATestsUtils.TA_OFFSET);
         
-        tradingRecord.operate(2);
-        tradingRecord.operate(3);
+        tradingRecord.enter(2);
+        tradingRecord.exit(3);
         assertEquals(5.2d, transactionCost.calculate(series, tradingRecord), TATestsUtils.TA_OFFSET);
 
-        tradingRecord.operate(0);
+        tradingRecord.enter(0);
         assertEquals(6.5d, transactionCost.calculate(series, tradingRecord), TATestsUtils.TA_OFFSET);
     }
 
@@ -75,13 +75,13 @@ public class LinearTransactionCostCriterionTest {
 
         assertEquals(0, (int) transactionCost.calculate(series, trade));
 
-        trade.operate(1);
+        trade.enter(1);
         assertEquals(0.75d, transactionCost.calculate(series, trade), TATestsUtils.TA_OFFSET);
 
-        trade.operate(3);
+        trade.exit(3);
         assertEquals(1.5d, transactionCost.calculate(series, trade), TATestsUtils.TA_OFFSET);
 
-        trade.operate(4);
+        trade.enter(4);
         assertEquals(1.5d, transactionCost.calculate(series, trade), TATestsUtils.TA_OFFSET);
     }
 

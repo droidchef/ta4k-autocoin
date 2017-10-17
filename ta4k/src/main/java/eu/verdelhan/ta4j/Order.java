@@ -189,6 +189,14 @@ public class Order implements Serializable {
 
     /**
      * @param index the index the order is executed
+     * @return a BUY order
+     */
+    public static Order buyAt(int index, Decimal price) {
+        return new Order(index, OrderType.BUY, price, Decimal.NaN);
+    }
+
+    /**
+     * @param index the index the order is executed
      * @param price the price for the order
      * @param amount the amount to be (or that was) bought
      * @return a BUY order
