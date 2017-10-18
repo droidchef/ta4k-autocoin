@@ -40,7 +40,7 @@ public class AverageProfitableTradesCriterionTest {
         TradingRecord tradingRecord = new BaseTradingRecord(
                 Order.buyAt(0), Order.sellAt(1),
                 Order.buyAt(2), Order.sellAt(3),
-                Order.buyAt(4), Order.sellAt(5));
+                Order.buyAt(4), Order.sellAt(5)).closeCurrent();
         
         AverageProfitableTradesCriterion average = new AverageProfitableTradesCriterion();
         

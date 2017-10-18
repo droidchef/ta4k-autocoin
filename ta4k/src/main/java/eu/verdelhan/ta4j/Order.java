@@ -35,7 +35,7 @@ import java.util.Objects;
  * <li>a price (optional)
  * <li>an amount to be (or that was) ordered (optional)
  * </ul>
- * A {@link Trade trade} is a pair of complementary orders.
+ * A {@link Trade trade} is a sets of complementary orders.
  */
 public class Order implements Serializable {
 
@@ -191,6 +191,14 @@ public class Order implements Serializable {
      * @param index the index the order is executed
      * @return a BUY order
      */
+    public static Order buyAt(int index, Double price) {
+        return new Order(index, OrderType.BUY, Decimal.valueOf(price), Decimal.NaN);
+    }
+
+    /**
+     * @param index the index the order is executed
+     * @return a BUY order
+     */
     public static Order buyAt(int index, Decimal price) {
         return new Order(index, OrderType.BUY, price, Decimal.NaN);
     }
@@ -211,6 +219,22 @@ public class Order implements Serializable {
      */
     public static Order sellAt(int index) {
         return new Order(index, OrderType.SELL);
+    }
+
+    /**
+     * @param index the index the order is executed
+     * @return a SELL order
+     */
+    public static Order sellAt(int index, Double price) {
+        return new Order(index, OrderType.SELL, Decimal.valueOf(price), Decimal.NaN);
+    }
+
+    /**
+     * @param index the index the order is executed
+     * @return a SELL order
+     */
+    public static Order sellAt(int index, Double price, Double amount) {
+        return new Order(index, OrderType.SELL, Decimal.valueOf(price), Decimal.valueOf(amount));
     }
 
     /**

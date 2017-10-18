@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- *
+ * <p>
  * Copyright (c) 2014-2017 Marc de Verdelhan & respective authors (see AUTHORS)
- *
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
  * the Software without restriction, including without limitation the rights to
  * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
  * the Software, and to permit persons to whom the Software is furnished to do so,
  * subject to the following conditions:
- *
+ * <p>
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- *
+ * <p>
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
  * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
@@ -23,8 +23,8 @@
 package eu.verdelhan.ta4j;
 
 import java.io.Serializable;
-import java.util.List;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 /**
  * Sequence of {@link Tick ticks} separated by a predefined period (e.g. 15 minutes, 1 day, etc.)
@@ -49,6 +49,14 @@ public interface TimeSeries extends Serializable {
      */
     Tick getTick(int i);
 
+    default Decimal getAverageTickClosePrices(List<Integer> indexes) {
+        Decimal sum = Decimal.ZERO;
+        for (int index: indexes) {
+            sum = sum.plus(getTick(index).getClosePrice());
+        }
+        return sum.dividedBy(Decimal.valueOf(indexes.size()));
+    }
+
     /**
      * @return the first tick of the series
      */
@@ -72,9 +80,9 @@ public interface TimeSeries extends Serializable {
      * @return true if the series is empty, false otherwise
      */
     default boolean isEmpty() {
-    	return getTickCount() == 0;
+        return getTickCount() == 0;
     }
-    
+
     /**
      * Warning: should be used carefully!
      * <p>
@@ -86,7 +94,7 @@ public interface TimeSeries extends Serializable {
      * @return the raw tick data
      */
     List<Tick> getTickData();
-    
+
     /**
      * @return the begin index of the series
      */
@@ -130,7 +138,7 @@ public interface TimeSeries extends Serializable {
      * @return the number of removed ticks
      */
     int getRemovedTicksCount();
-    
+
     /**
      * Adds a tick at the end of the series.
      * <p>

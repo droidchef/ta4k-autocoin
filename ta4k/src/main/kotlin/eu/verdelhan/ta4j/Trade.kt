@@ -12,7 +12,7 @@ import java.util.*
  *   entries == BUY, BUY... --> exits == SELL, SELL...
  *   entries == SELL, SELL... --> exits == BUY, BUY...
  */
-class Trade(private val startingType: Order.OrderType = BUY) : Serializable {
+class Trade(val startingType: Order.OrderType = BUY) : Serializable {
 
     private val entries: MutableList<Order> = ArrayList()
     private val exits: MutableList<Order> = ArrayList()
@@ -31,20 +31,20 @@ class Trade(private val startingType: Order.OrderType = BUY) : Serializable {
         if (exits.isEmpty()) throw IllegalArgumentException("Exit orders must not be empty")
         if (entries.distinctBy { it.type }.count() > 1) throw IllegalArgumentException("Entry orders must have same types")
         if (exits.distinctBy { it.type }.count() > 1) throw IllegalArgumentException("Exit orders must have same types")
-        if (entries.first() == exits.first()) throw IllegalArgumentException("Entry and exit orders must have different types")
+        if (entries.first().type === exits.first().type) throw IllegalArgumentException("Entry and exit orders must have different starting types")
         this.entries.addAll(entries)
         this.exits.addAll(exits)
     }
 
     /**
-     * @return the first entry {@link Order order} of the trade
+     * @return entries {@link Order order} of the trade
      */
-    fun getEntry(): Order? = entries.firstOrNull()
+    fun getEntries(): List<Order> = Collections.unmodifiableList(entries)
 
     /**
-     * @return the first exit {@link Order order} of the trade
+     * @return exits {@link Order order} of the trade
      */
-    fun getExit(): Order? = exits.firstOrNull()
+    fun getExits(): List<Order> = Collections.unmodifiableList(exits)
 
     override fun equals(other: Any?): Boolean {
         return if (other is Trade) entries == other.entries && exits == other.exits
@@ -54,6 +54,12 @@ class Trade(private val startingType: Order.OrderType = BUY) : Serializable {
     override fun hashCode() = Objects.hash(entries, exits)
 
     fun enter(index: Int): Order = enter(index, Decimal.NaN, Decimal.NaN)
+
+    fun enter(index: Int, price: Double): Order = enter(index, Decimal.valueOf(price), Decimal.NaN)
+
+    fun enter(index: Int, price: Double, amount: Double): Order = enter(index, Decimal.valueOf(price), Decimal.valueOf(amount))
+
+    fun enter(index: Int, price: Decimal): Order = enter(index, price, Decimal.NaN)
 
     fun enter(index: Int, price: Decimal, amount: Decimal): Order {
         if (index < entries.lastOrNull()?.index ?: 0) throw IllegalStateException("The index i is less than the entryOrder index")
@@ -65,9 +71,14 @@ class Trade(private val startingType: Order.OrderType = BUY) : Serializable {
 
     fun exit(index: Int): Order = exit(index, Decimal.NaN, Decimal.NaN)
 
+    fun exit(index: Int, price: Double): Order = exit(index, Decimal.valueOf(price), Decimal.NaN)
+
+    fun exit(index: Int, price: Double, amount: Double): Order = exit(index, Decimal.valueOf(price), Decimal.valueOf(amount))
+
     fun exit(index: Int, price: Decimal, amount: Decimal): Order {
-        if (index < exits.lastOrNull()?.index ?: 0) throw IllegalStateException("The index i is less than the entryOrder index")
+        if (index < exits.lastOrNull()?.index ?: 0) throw IllegalStateException("The index i is less than last exit order index")
         if (entries.isEmpty()) throw IllegalStateException("Cannot exit when there is no enter order")
+        if (index < entries.lastOrNull()?.index ?:0) throw IllegalStateException("The index i is less than last  entry order index")
         val order = Order(index, startingType.complementType(), price, amount)
         exits.add(order)
         return order
@@ -75,9 +86,12 @@ class Trade(private val startingType: Order.OrderType = BUY) : Serializable {
 
     fun isOpened() = entries.isNotEmpty() && exits.isEmpty()
 
-    fun close() {
+    fun canExit() = entries.isNotEmpty()
+
+    fun close(): Trade {
         if (isClosed) throw IllegalStateException("Cannot close already closed trade")
         isClosed = true
+        return this
     }
 
     fun isClosed() = isClosed
@@ -109,9 +123,55 @@ class Trade(private val startingType: Order.OrderType = BUY) : Serializable {
 
     fun getLastExit() = exits.lastOrNull()
 
+    fun getEntriesValue(): Decimal {
+        if (isNew()) throw IllegalStateException("Cannot calculate entries value when no entries")
+        verifyAllEntryOrdersHavePrice()
+
+        return ordersValue(entries)
+    }
+
+    fun getEntryIndexes(): List<Int> = entries.map { it.index }
+
+    fun getExitIndexes(): List<Int> = exits.map { it.index }
+
+    private fun ordersValue(orders: List<Order>): Decimal {
+        return if (orders.first().amount === Decimal.NaN) {
+            val equalAmountPerOrder = Decimal.ONE.dividedBy(Decimal.valueOf(orders.size))
+            var value = Decimal.ZERO
+            orders.forEach { value += it.price.multipliedBy(equalAmountPerOrder) }
+            value
+        } else {
+            var value = Decimal.ZERO
+            orders.forEach { value += it.price.multipliedBy(it.amount) }
+            value
+        }
+    }
+
     fun getExitsValue(): Decimal {
         if (!canBeClosed()) throw IllegalStateException("Cannot calculate exits value when no entries and exits")
-        return Decimal.NaN
+        verifyAllExitOrdersHavePrice()
+
+        return ordersValue(exits)
     }
+
+    private fun verifyAllExitOrdersHavePrice() {
+        if (exits.any { it.price === Decimal.NaN }) throw IllegalStateException("Cannot calculate exit orders value when there is no price set")
+    }
+
+    private fun verifyAllEntryOrdersHavePrice() {
+        if (entries.any { it.price === Decimal.NaN }) throw IllegalStateException("Cannot calculate exit orders value when there is no price set")
+    }
+
+    fun hasPrices() = canBeClosed() && entries.first().price !== Decimal.NaN && exits.last().price !== Decimal.NaN
+
+    fun hasAmounts() = entries.none{ it.amount === Decimal.NaN } && exits.none{ it.amount === Decimal.NaN }
+
+    fun entryIsBuy() = startingType === BUY
+
+    fun getFirstEntryIndex() = entries.first().index
+
+    fun getLastExitIndex() = exits.last().index
+
+    fun getFirstEntry() = entries.first()
 
 }

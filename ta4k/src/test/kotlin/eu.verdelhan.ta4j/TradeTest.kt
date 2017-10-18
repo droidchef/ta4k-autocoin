@@ -69,16 +69,56 @@ class TradeTest {
         newTrade.getExitsValue()
     }
 
-    @Test
-    fun whenSingleEntryAndExitshouldCalculateExitsValue() {
-        newTrade.enter(1)
+    @Test(expected = IllegalStateException::class)
+    fun whenEntryWithoutPriceShouldNotCalculateEntriesValue() {
         newTrade.enter(2)
+        newTrade.getEntriesValue()
+    }
+
+    @Test
+    fun whenSingleEntryWithoutAmountShouldCalculateEntriesValue() {
+        newTrade.enter(2, 1.5)
+        assertThat(newTrade.getEntriesValue()).isEqualTo(Decimal.valueOf(1.5))
+    }
+
+    @Test
+    fun whenMultipleEntriesWithAmountShouldCalculateEntriesValue() {
+        newTrade.enter(2, 1.5, 1.1)
+        newTrade.enter(3, 1.4, 0.8)
+        newTrade.enter(3, 1.7, 0.9)
+        assertThat(newTrade.getEntriesValue().toDouble()).isEqualTo(1.5 * 1.1 + 1.4 * 0.8 + 1.7 * 0.9)
+    }
+
+    @Test
+    fun whenSingleEntryAndExitWithoutAmountShouldCalculateExitsValue() {
+        newTrade.enter(1, 1.0)
+        newTrade.exit(2, 1.1)
+        assertThat(newTrade.getExitsValue().toDouble()).isEqualTo(1.1)
+    }
+
+    @Test
+    fun whenMultipleEntriesAndExitsWithoutAmountShouldCalculateExitsValue() {
+        newTrade.enter(1, 1.0)
+        newTrade.enter(2, 0.9)
+        newTrade.enter(3, 1.15)
+        newTrade.exit(4, 1.2)
+        newTrade.exit(5, 1.25)
+        assertThat(newTrade.getExitsValue().toDouble()).isEqualTo(1.2 * 0.5 + 1.25 * 0.5)
+    }
+
+    @Test
+    fun whenMultipleEntriesWithoutAmountShouldCalculateEntriesValue() {
+        val oneThird = 1.0 / 3
+        newTrade.enter(1, 1.0)
+        newTrade.enter(2, 0.9)
+        newTrade.enter(3, 1.15)
+        assertThat(newTrade.getEntriesValue().toDouble()).isEqualTo(1.0 * oneThird + 0.9 * oneThird + 1.15 * oneThird)
     }
 
     @Test
     fun whenNewShouldCreateBuyOrderWhenEntering() {
         newTrade.enter(0)
-        assertThat(newTrade.getEntry()).isEqualTo(Order.buyAt(0))
+        assertThat(newTrade.getFirstEntry()).isEqualTo(Order.buyAt(0))
     }
 
     @Test
@@ -90,7 +130,7 @@ class TradeTest {
     fun whenOpenedShouldCreateSellOrderWhenExiting() {
         newTrade.enter(0)
         newTrade.exit(1)
-        assertThat(newTrade.getExit()).isEqualTo(Order.sellAt(1))
+        assertThat(newTrade.getLastExit()).isEqualTo(Order.sellAt(1))
     }
 
     @Test(expected = IllegalStateException::class)
@@ -109,22 +149,22 @@ class TradeTest {
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun shouldThrowIllegalArgumentExceptionWhenOrdersHaveSameType() {
+    fun shouldThrowExceptionWhenOrdersHaveSameType() {
         Trade(Order.buyAt(0), Order.buyAt(1))
     }
 
     @Test
     fun whenNewShouldCreateSellOrderWhenEnteringUncovered() {
         uncoveredTrade.enter(0)
-        assertThat(uncoveredTrade.getEntry()).isEqualTo(Order.sellAt(0))
+        assertThat(uncoveredTrade.getFirstEntry()).isEqualTo(Order.sellAt(0))
     }
 
     @Test
     fun whenOpenedShouldCreateBuyOrderWhenExitingUncovered() {
         uncoveredTrade.enter(0)
-        uncoveredTrade.enter(1)
-        assertThat(uncoveredTrade.getLastEntry()).isEqualTo(Order.buyAt(1))
-        assertThat(uncoveredTrade.getLastExit()).isNull()
+        uncoveredTrade.exit(1)
+        assertThat(uncoveredTrade.getLastEntry()).isEqualTo(Order.sellAt(0))
+        assertThat(uncoveredTrade.getLastExit()).isEqualTo(Order.buyAt(1))
     }
 
     @Test

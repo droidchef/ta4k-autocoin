@@ -51,7 +51,7 @@ class TotalProfitCriterionTest {
         val series = MockTimeSeries(100.0, 105.0, 110.0, 100.0, 95.0, 105.0)
         val tradingRecord = BaseTradingRecord(
                 Order.buyAt(0), Order.sellAt(2),
-                Order.buyAt(3), Order.sellAt(5))
+                Order.buyAt(3), Order.sellAt(5)).closeCurrent()
 
         assertEquals(1.10 * 1.05, profit.calculate(series, tradingRecord), TATestsUtils.TA_OFFSET)
     }
@@ -61,7 +61,7 @@ class TotalProfitCriterionTest {
         val series = MockTimeSeries(100.0, 95.0, 100.0, 80.0, 85.0, 70.0)
         val tradingRecord = BaseTradingRecord(
                 Order.buyAt(0), Order.sellAt(1),
-                Order.buyAt(2), Order.sellAt(5))
+                Order.buyAt(2), Order.sellAt(5)).closeCurrent()
 
         assertEquals(0.95 * 0.7, profit.calculate(series, tradingRecord), TATestsUtils.TA_OFFSET)
     }
@@ -71,7 +71,7 @@ class TotalProfitCriterionTest {
         val series = MockTimeSeries(100.0, 95.0, 100.0, 80.0, 85.0, 70.0)
         val tradingRecord = BaseTradingRecord(
                 Order.sellAt(0), Order.buyAt(1),
-                Order.sellAt(2), Order.buyAt(5))
+                Order.sellAt(2), Order.buyAt(5)).closeCurrent()
 
         assertEquals((1 / 0.95) * (1 / 0.7), profit.calculate(series, tradingRecord), TATestsUtils.TA_OFFSET)
     }

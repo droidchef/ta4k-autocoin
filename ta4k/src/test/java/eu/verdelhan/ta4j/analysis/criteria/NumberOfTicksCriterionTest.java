@@ -47,7 +47,7 @@ public class NumberOfTicksCriterionTest {
         MockTimeSeries series = new MockTimeSeries(100, 105, 110, 100, 95, 105);
         TradingRecord tradingRecord = new BaseTradingRecord(
                 Order.buyAt(0), Order.sellAt(2),
-                Order.buyAt(3), Order.sellAt(5));
+                Order.buyAt(3), Order.sellAt(5)).closeCurrent();
 
         AnalysisCriterion numberOfTicks = new NumberOfTicksCriterion();
         assertEquals(6, numberOfTicks.calculate(series, tradingRecord), TATestsUtils.TA_OFFSET);
@@ -57,6 +57,7 @@ public class NumberOfTicksCriterionTest {
     public void calculateWithOneTrade() {
         MockTimeSeries series = new MockTimeSeries(100, 95, 100, 80, 85, 70);
         Trade t = new Trade(Order.buyAt(2), Order.sellAt(5));
+        t.close();
         AnalysisCriterion numberOfTicks = new NumberOfTicksCriterion();
         assertEquals(4, numberOfTicks.calculate(series, t), TATestsUtils.TA_OFFSET);
     }

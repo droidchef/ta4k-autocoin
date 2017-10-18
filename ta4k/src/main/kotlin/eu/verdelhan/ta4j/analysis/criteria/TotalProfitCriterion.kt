@@ -22,10 +22,7 @@
  */
 package eu.verdelhan.ta4j.analysis.criteria
 
-import eu.verdelhan.ta4j.Decimal
-import eu.verdelhan.ta4j.TimeSeries
-import eu.verdelhan.ta4j.Trade
-import eu.verdelhan.ta4j.TradingRecord
+import eu.verdelhan.ta4j.*
 
 /**
  * Total profit criterion.
@@ -54,10 +51,19 @@ class TotalProfitCriterion : AbstractAnalysisCriterion() {
     private fun calculateProfit(series: TimeSeries, trade: Trade): Double {
         var profit = Decimal.ONE
         if (trade.isClosed()) {
-            val exitClosePrice = series.getTick(trade.getExit()!!.index).closePrice
-            val entryClosePrice = series.getTick(trade.getEntry()!!.index).closePrice
-            profit = if (trade.getEntry()!!.isBuy) exitClosePrice.dividedBy(entryClosePrice)
-            else entryClosePrice.dividedBy(exitClosePrice)
+            profit = if (trade.hasPrices()) {
+                val exitsValue = trade.getExitsValue()
+                val entriesValue = trade.getEntriesValue()
+                if (trade.entryIsBuy()) exitsValue.dividedBy(entriesValue)
+                else entriesValue.dividedBy(exitsValue)
+            } else {
+                val exitIndexes = trade.getExitIndexes()
+                val entryIndexes = trade.getEntryIndexes()
+                val averageExitClosePrice = series.getAverageTickClosePrices(exitIndexes)
+                val averageEntryClosePrice = series.getAverageTickClosePrices(entryIndexes)
+                if (trade.entryIsBuy()) averageExitClosePrice.dividedBy(averageEntryClosePrice)
+                else averageEntryClosePrice.dividedBy(averageExitClosePrice)
+            }
         }
         return profit.toDouble()
     }

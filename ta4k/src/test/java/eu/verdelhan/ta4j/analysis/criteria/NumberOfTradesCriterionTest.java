@@ -47,7 +47,7 @@ public class NumberOfTradesCriterionTest {
         MockTimeSeries series = new MockTimeSeries(100, 105, 110, 100, 95, 105);
         TradingRecord tradingRecord = new BaseTradingRecord(
                 Order.buyAt(0), Order.sellAt(2),
-                Order.buyAt(3), Order.sellAt(5));
+                Order.buyAt(3), Order.sellAt(5)).closeCurrent();
 
         AnalysisCriterion buyAndHold = new NumberOfTradesCriterion();
         assertEquals(2d, buyAndHold.calculate(series, tradingRecord), TATestsUtils.TA_OFFSET);

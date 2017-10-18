@@ -40,9 +40,9 @@ interface TradingRecord : Serializable {
     fun getCurrentTrade(): Trade
 
     /**
-     * @return true if no trade is open, false otherwise
+     * @return true if current trade is closed, false otherwise
      */
-    fun isClosed() = !getCurrentTrade().isOpened()
+    fun isClosed() = getCurrentTrade().isClosed()
 
     /**
      * @return the recorded trades

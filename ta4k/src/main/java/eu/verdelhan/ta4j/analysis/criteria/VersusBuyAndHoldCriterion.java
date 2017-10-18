@@ -50,6 +50,7 @@ public class VersusBuyAndHoldCriterion extends AbstractAnalysisCriterion {
         TradingRecord fakeRecord = new BaseTradingRecord();
         fakeRecord.enter(series.getBeginIndex());
         fakeRecord.exit(series.getEndIndex());
+        fakeRecord.closeCurrent();
 
         return criterion.calculate(series, tradingRecord) / criterion.calculate(series, fakeRecord);
     }
@@ -59,6 +60,7 @@ public class VersusBuyAndHoldCriterion extends AbstractAnalysisCriterion {
         TradingRecord fakeRecord = new BaseTradingRecord();
         fakeRecord.enter(series.getBeginIndex());
         fakeRecord.exit(series.getEndIndex());
+        fakeRecord.closeCurrent();
 
         return criterion.calculate(series, trade) / criterion.calculate(series, fakeRecord);
     }

@@ -43,7 +43,7 @@ public class CashFlow implements Indicator<Decimal> {
     private final TimeSeries timeSeries;
 
     /** The cash flow values */
-    private List<Decimal> values = new ArrayList<Decimal>(Arrays.asList(Decimal.ONE));
+    private List<Decimal> values = new ArrayList<>(Arrays.asList(Decimal.ONE));
 
     public CashFlow(TimeSeries timeSeries, Trade trade) {
         this.timeSeries = timeSeries;
@@ -79,21 +79,31 @@ public class CashFlow implements Indicator<Decimal> {
     }
 
     private void calculate(Trade trade) {
-        final int entryIndex = trade.getEntry().getIndex();
-        int begin = entryIndex + 1;
+        List<Integer> entryIndexes = trade.getEntryIndexes();
+        List<Integer> exitIndexes = trade.getExitIndexes();
+
+        int begin = entryIndexes.get(0) + 1;
         if (begin > values.size()) {
             Decimal lastValue = values.get(values.size() - 1);
             values.addAll(Collections.nCopies(begin - values.size(), lastValue));
         }
-        int end = trade.getExit().getIndex();
+        int end = exitIndexes.get(exitIndexes.size() - 1);
         for (int i = Math.max(begin, 1); i <= end; i++) {
             Decimal ratio;
-            if (trade.getEntry().isBuy()) {
-                ratio = timeSeries.getTick(i).getClosePrice().dividedBy(timeSeries.getTick(entryIndex).getClosePrice());
+            if (trade.entryIsBuy()) {
+                if (trade.hasPrices()) {
+                    ratio = trade.getExitsValue().dividedBy(trade.getEntriesValue());
+                } else {
+                    ratio = timeSeries.getTick(i).getClosePrice().dividedBy(timeSeries.getAverageTickClosePrices(entryIndexes));
+                }
             } else {
-                ratio = timeSeries.getTick(entryIndex).getClosePrice().dividedBy(timeSeries.getTick(i).getClosePrice());
+                if (trade.hasPrices()) {
+                    ratio = trade.getEntriesValue().dividedBy(trade.getExitsValue());
+                } else {
+                    ratio = timeSeries.getAverageTickClosePrices(entryIndexes).dividedBy(timeSeries.getTick(i).getClosePrice());
+                }
             }
-            values.add(values.get(entryIndex).multipliedBy(ratio));
+            values.add(values.get(entryIndexes.get(0)).multipliedBy(ratio));
         }
     }
 

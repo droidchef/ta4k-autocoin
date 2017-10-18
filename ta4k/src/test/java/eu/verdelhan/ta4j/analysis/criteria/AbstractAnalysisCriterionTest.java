@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- *
+ * <p>
  * Copyright (c) 2014-2017 Marc de Verdelhan & respective authors (see AUTHORS)
- *
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
  * the Software without restriction, including without limitation the rights to
  * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
  * the Software, and to permit persons to whom the Software is furnished to do so,
  * subject to the following conditions:
- *
+ * <p>
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- *
+ * <p>
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
  * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
@@ -22,21 +22,43 @@
  */
 package eu.verdelhan.ta4j.analysis.criteria;
 
-import eu.verdelhan.ta4j.BaseStrategy;
-import eu.verdelhan.ta4j.Strategy;
-import eu.verdelhan.ta4j.TimeSeriesManager;
+import eu.verdelhan.ta4j.*;
 import eu.verdelhan.ta4j.mocks.MockTimeSeries;
 import eu.verdelhan.ta4j.trading.rules.BooleanRule;
 import eu.verdelhan.ta4j.trading.rules.FixedRule;
-import java.util.ArrayList;
-import java.util.List;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+
 public class AbstractAnalysisCriterionTest {
 
-    private Strategy alwaysStrategy;
+    class AlwaysBuyAfterSellRule implements Rule {
+        @Override
+        public boolean isSatisfied(int index, TradingRecord tradingRecord) {
+            boolean result = true;
+            if (tradingRecord.getLastOrder() != null && tradingRecord.getLastOrder().getType() == Order.OrderType.BUY) {
+                result = false;
+            }
+            return result;
+        }
+    }
+
+    class AlwaysSellAfterBuyRule implements Rule {
+        @Override
+        public boolean isSatisfied(int index, TradingRecord tradingRecord) {
+            boolean result = false;
+            if (tradingRecord.getLastOrder() != null && tradingRecord.getLastOrder().getType() == Order.OrderType.BUY) {
+                result = true;
+            }
+            return result;
+        }
+    }
+
+    private Strategy alwaysBuyThenSellStrategy;
 
     private Strategy buyAndHoldStrategy;
 
@@ -44,11 +66,9 @@ public class AbstractAnalysisCriterionTest {
 
     @Before
     public void setUp() {
-        alwaysStrategy = new BaseStrategy(BooleanRule.TRUE, BooleanRule.TRUE);
+        alwaysBuyThenSellStrategy = new BaseStrategy(new AlwaysBuyAfterSellRule(), new AlwaysSellAfterBuyRule());
         buyAndHoldStrategy = new BaseStrategy(new FixedRule(0), new FixedRule(4));
-        strategies = new ArrayList<Strategy>();
-        strategies.add(alwaysStrategy);
-        strategies.add(buyAndHoldStrategy);
+        strategies = Arrays.asList(alwaysBuyThenSellStrategy, buyAndHoldStrategy);
     }
 
     @Test
@@ -56,7 +76,7 @@ public class AbstractAnalysisCriterionTest {
         MockTimeSeries series = new MockTimeSeries(6.0, 9.0, 6.0, 6.0);
         TimeSeriesManager manager = new TimeSeriesManager(series);
         Strategy bestStrategy = new TotalProfitCriterion().chooseBest(manager, strategies);
-        assertEquals(alwaysStrategy, bestStrategy);
+        assertEquals(alwaysBuyThenSellStrategy, bestStrategy);
     }
 
     @Test

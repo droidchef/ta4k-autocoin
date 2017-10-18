@@ -39,7 +39,7 @@ public class VersusBuyAndHoldCriterionTest {
         MockTimeSeries series = new MockTimeSeries(100, 105, 110, 100, 95, 105);
         TradingRecord tradingRecord = new BaseTradingRecord(
                 Order.buyAt(0), Order.sellAt(2),
-                Order.buyAt(3), Order.sellAt(5));
+                Order.buyAt(3), Order.sellAt(5)).closeCurrent();
 
         AnalysisCriterion buyAndHold = new VersusBuyAndHoldCriterion(new TotalProfitCriterion());
         assertEquals(1.10 * 1.05 / 1.05, buyAndHold.calculate(series, tradingRecord), TATestsUtils.TA_OFFSET);
@@ -50,7 +50,7 @@ public class VersusBuyAndHoldCriterionTest {
         MockTimeSeries series = new MockTimeSeries(100, 95, 100, 80, 85, 70);
         TradingRecord tradingRecord = new BaseTradingRecord(
                 Order.buyAt(0), Order.sellAt(1),
-                Order.buyAt(2), Order.sellAt(5));
+                Order.buyAt(2), Order.sellAt(5)).closeCurrent();
 
         AnalysisCriterion buyAndHold = new VersusBuyAndHoldCriterion(new TotalProfitCriterion());
         assertEquals(0.95 * 0.7 / 0.7, buyAndHold.calculate(series, tradingRecord), TATestsUtils.TA_OFFSET);
@@ -60,6 +60,7 @@ public class VersusBuyAndHoldCriterionTest {
     public void calculateWithOnlyOneTrade() {
         MockTimeSeries series = new MockTimeSeries(100, 95, 100, 80, 85, 70);
         Trade trade = new Trade(Order.buyAt(0), Order.sellAt(1));
+        trade.close();
 
         AnalysisCriterion buyAndHold = new VersusBuyAndHoldCriterion(new TotalProfitCriterion());
         assertEquals((100d / 70) / (100d / 95), buyAndHold.calculate(series, trade), TATestsUtils.TA_OFFSET);
@@ -78,7 +79,7 @@ public class VersusBuyAndHoldCriterionTest {
         MockTimeSeries series = new MockTimeSeries(100, 95, 100, 80, 85, 130);
         TradingRecord tradingRecord = new BaseTradingRecord(
                 Order.buyAt(0), Order.sellAt(1),
-                Order.buyAt(2), Order.sellAt(5));
+                Order.buyAt(2), Order.sellAt(5)).closeCurrent();
 
         AnalysisCriterion buyAndHold = new VersusBuyAndHoldCriterion(new AverageProfitCriterion());
         
@@ -90,7 +91,7 @@ public class VersusBuyAndHoldCriterionTest {
         MockTimeSeries series = new MockTimeSeries(100, 95, 100, 80, 85, 130);
         TradingRecord tradingRecord = new BaseTradingRecord(
                 Order.buyAt(0), Order.sellAt(1),
-                Order.buyAt(2), Order.sellAt(5));
+                Order.buyAt(2), Order.sellAt(5)).closeCurrent();
 
         AnalysisCriterion buyAndHold = new VersusBuyAndHoldCriterion(new NumberOfTicksCriterion());
         

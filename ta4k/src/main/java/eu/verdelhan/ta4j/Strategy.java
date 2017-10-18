@@ -50,21 +50,6 @@ public interface Strategy {
      * @return true if this strategy is unstable at the provided index, false otherwise (stable)
      */
     boolean isUnstableAt(int index);
-    
-    /**
-     * @param index the tick index
-     * @param tradingRecord the potentially needed trading history
-     * @return true to recommend an order, false otherwise (no recommendation)
-     */
-    default boolean shouldOperate(int index, TradingRecord tradingRecord) {
-        Trade trade = tradingRecord.getCurrentTrade();
-        if (trade.isNew()) {
-            return shouldEnter(index, tradingRecord);
-        } else if (trade.isOpened()) {
-            return shouldExit(index, tradingRecord);
-        }
-        return false;
-    }
 
     /**
      * @param index the tick index
@@ -101,7 +86,7 @@ public interface Strategy {
      * @return true to recommend to exit, false otherwise
      */
     default boolean shouldExit(int index, TradingRecord tradingRecord) {
-        if (isUnstableAt(index)) {
+        if (isUnstableAt(index) || (tradingRecord != null && !tradingRecord.getCurrentTrade().canExit())) {
             return false;
         }
         final boolean exit = getExitRule().isSatisfied(index, tradingRecord);

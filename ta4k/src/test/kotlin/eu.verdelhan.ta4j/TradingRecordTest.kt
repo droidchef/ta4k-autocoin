@@ -53,14 +53,13 @@ class TradingRecordTest {
     }
 
     @Test
-    fun shouldClosedBeNew() {
+    fun shouldBeNewAfterClosing() {
         assertThat(closedRecord.getCurrentTrade().isNew()).isTrue()
     }
 
-
     @Test
-    fun isEmptyBeClosed() {
-        assertThat(emptyRecord.isClosed()).isTrue()
+    fun shouldEmptyNotBeClosed() {
+        assertThat(emptyRecord.isClosed()).isFalse()
     }
 
     @Test
@@ -69,8 +68,8 @@ class TradingRecordTest {
     }
 
     @Test
-    fun shouldClosedBeClosed() {
-        assertThat(closedRecord.isClosed()).isTrue()
+    fun shouldClosedHaveTradeRecorded() {
+        assertThat(closedRecord.getTradeCount()).isEqualTo(2)
     }
 
     @Test

@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- *
+ * <p>
  * Copyright (c) 2014-2017 Marc de Verdelhan & respective authors (see AUTHORS)
- *
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
  * the Software without restriction, including without limitation the rights to
  * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
  * the Software, and to permit persons to whom the Software is furnished to do so,
  * subject to the following conditions:
- *
+ * <p>
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- *
+ * <p>
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
  * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
@@ -36,7 +36,7 @@ public class TimeSeriesManager {
 
     /** The logger */
     private final Logger log = LoggerFactory.getLogger(getClass());
-    
+
     /** The managed time series */
     private TimeSeries timeSeries;
 
@@ -44,30 +44,30 @@ public class TimeSeriesManager {
      * Constructor.
      */
     public TimeSeriesManager() {
-	}
-    
+    }
+
     /**
      * Constructor.
      * @param timeSeries the time series to be managed
      */
     public TimeSeriesManager(TimeSeries timeSeries) {
-    	this.timeSeries = timeSeries;
+        this.timeSeries = timeSeries;
     }
 
     /**
      * @param timeSeries the time series to be managed
      */
     public void setTimeSeries(TimeSeries timeSeries) {
-		this.timeSeries = timeSeries;
-	}
-    
+        this.timeSeries = timeSeries;
+    }
+
     /**
      * @return the managed time series
      */
     public TimeSeries getTimeSeries() {
-		return timeSeries;
-	}
-    
+        return timeSeries;
+    }
+
     /**
      * Runs the provided strategy over the managed series.
      * <p>
@@ -144,15 +144,14 @@ public class TimeSeriesManager {
 
         int runBeginIndex = Math.max(startIndex, timeSeries.getBeginIndex());
         int runEndIndex = Math.min(finishIndex, timeSeries.getEndIndex());
-        
+
         log.trace("Running strategy (indexes: {} -> {}): {} (starting with {})", runBeginIndex, runEndIndex, strategy, orderType);
         TradingRecord tradingRecord = new BaseTradingRecord(orderType);
         for (int i = runBeginIndex; i <= runEndIndex; i++) {
             // For each tick between both indexes...       
             if (strategy.shouldEnter(i, tradingRecord)) {
                 tradingRecord.enter(i, timeSeries.getTick(i).getClosePrice(), amount);
-            }
-            if (strategy.shouldExit(i, tradingRecord)) {
+            } else if (strategy.shouldExit(i, tradingRecord)) {
                 tradingRecord.exit(i, timeSeries.getTick(i).getClosePrice(), amount);
             }
         }
@@ -171,14 +170,14 @@ public class TimeSeriesManager {
                 // --> Trying to close the last trade
                 if (strategy.shouldEnter(i, tradingRecord)) {
                     tradingRecord.enter(i, timeSeries.getTick(i).getClosePrice(), amount);
-                    tradingRecord.closeCurrent();
                     break;
-                }
-                if (strategy.shouldExit(i, tradingRecord)) {
+                } else if (strategy.shouldExit(i, tradingRecord)) {
                     tradingRecord.exit(i, timeSeries.getTick(i).getClosePrice(), amount);
-                    tradingRecord.closeCurrent();
                     break;
                 }
+            }
+            if (tradingRecord.getCurrentTrade().canBeClosed()) {
+                tradingRecord.closeCurrent();
             }
         }
     }

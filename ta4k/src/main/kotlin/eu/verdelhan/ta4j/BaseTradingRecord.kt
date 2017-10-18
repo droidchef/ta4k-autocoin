@@ -57,6 +57,10 @@ class BaseTradingRecord : TradingRecord {
         createTradesFrom(orders.asList())
     }
 
+    constructor(vararg trades: Trade) : this(trades[0].startingType) {
+        this.trades.addAll(trades.asList())
+    }
+
     private fun createTradesFrom(orders: List<Order>) = orders.forEach { addOrder(it) }
 
     private fun addOrder(order: Order) {

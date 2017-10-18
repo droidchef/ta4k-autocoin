@@ -59,8 +59,8 @@ public class CashFlowTest {
         TimeSeries sampleTimeSeries = new MockTimeSeries(2, 1, 3, 5, 6, 3, 20);
         TradingRecord tradingRecord = new BaseTradingRecord(
                 Order.buyAt(0), Order.sellAt(1),
-                Order.buyAt(3), Order.sellAt(4), Order.sellAt(5),
-                Order.buyAt(6));
+                Order.buyAt(3), Order.sellAt(4),
+                Order.buyAt(5), Order.sellAt(6)).closeCurrent();
 
         CashFlow cashFlow = new CashFlow(sampleTimeSeries, tradingRecord);
 
@@ -70,7 +70,7 @@ public class CashFlowTest {
         assertDecimalEquals(cashFlow.getValue(3), "0.5");
         assertDecimalEquals(cashFlow.getValue(4), "0.6");
         assertDecimalEquals(cashFlow.getValue(5), "0.6");
-        assertDecimalEquals(cashFlow.getValue(6), "0.09");
+        assertDecimalEquals(cashFlow.getValue(6), "4.0");
     }
 
 
@@ -93,18 +93,17 @@ public class CashFlowTest {
     public void cashFlowShortSell() {
         TimeSeries sampleTimeSeries = new MockTimeSeries(1, 2, 4, 8, 16, 32);
         TradingRecord tradingRecord = new BaseTradingRecord(
-                Order.buyAt(0), Order.sellAt(2),
-                Order.sellAt(2), Order.buyAt(4),
-                Order.buyAt(4), Order.sellAt(5));
+                Order.buyAt(0, 1.0), Order.sellAt(2, 4.0), Order.sellAt(3, 8.0),
+                Order.buyAt(4, 16.0), Order.sellAt(5, 32.0)).closeCurrent();
 
         CashFlow cashFlow = new CashFlow(sampleTimeSeries, tradingRecord);
 
         assertDecimalEquals(cashFlow.getValue(0), 1);
-        assertDecimalEquals(cashFlow.getValue(1), 2);
-        assertDecimalEquals(cashFlow.getValue(2), 4);
-        assertDecimalEquals(cashFlow.getValue(3), 2);
-        assertDecimalEquals(cashFlow.getValue(4), 1);
-        assertDecimalEquals(cashFlow.getValue(5), 2);
+        assertDecimalEquals(cashFlow.getValue(1), 6);
+        assertDecimalEquals(cashFlow.getValue(2), 6);
+        assertDecimalEquals(cashFlow.getValue(3), 6);
+        assertDecimalEquals(cashFlow.getValue(4), 6);
+        assertDecimalEquals(cashFlow.getValue(5), 12);
     }
 
     @Test
@@ -157,7 +156,7 @@ public class CashFlowTest {
         TradingRecord tradingRecord = new BaseTradingRecord(
                 Order.buyAt(0), Order.sellAt(2),
                 Order.buyAt(6), Order.sellAt(8),
-                Order.buyAt(9), Order.sellAt(11));
+                Order.buyAt(9), Order.sellAt(11)).closeCurrent();
 
         CashFlow cashFlow = new CashFlow(sampleTimeSeries, tradingRecord);
 
@@ -179,7 +178,7 @@ public class CashFlowTest {
         sampleTimeSeries = new MockTimeSeries(5d, 6d, 3d, 7d, 8d, 6d, 10d, 15d, 6d);
 		tradingRecord = new BaseTradingRecord(
 				Order.buyAt(4), Order.sellAt(5),
-				Order.buyAt(6), Order.sellAt(8));
+				Order.buyAt(6), Order.sellAt(8)).closeCurrent();
 
 		CashFlow flow = new CashFlow(sampleTimeSeries, tradingRecord);
 		assertDecimalEquals(flow.getValue(0), 1);
