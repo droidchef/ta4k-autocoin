@@ -44,17 +44,17 @@ class TradingRecordTest {
 
     @Test
     fun shouldEmptyBeNew() {
-        assertThat(emptyRecord.getCurrentTrade().isNew()).isTrue()
+        assertThat(emptyRecord.currentTrade.isNew()).isTrue()
     }
 
     @Test
     fun shouldOpenedBeOpened() {
-        assertThat(openedRecord.getCurrentTrade().isOpened()).isTrue()
+        assertThat(openedRecord.currentTrade.isOpened()).isTrue()
     }
 
     @Test
     fun shouldBeNewAfterClosing() {
-        assertThat(closedRecord.getCurrentTrade().isNew()).isTrue()
+        assertThat(closedRecord.currentTrade.isNew()).isTrue()
     }
 
     @Test
@@ -79,7 +79,7 @@ class TradingRecordTest {
         // when
         record.enter(1)
         // then
-        assertThat(record.getCurrentTrade().isOpened()).isTrue()
+        assertThat(record.currentTrade.isOpened()).isTrue()
     }
 
     @Test
@@ -90,7 +90,7 @@ class TradingRecordTest {
         record.enter(1)
         record.enter(2)
         // then
-        assertThat(record.getCurrentTrade().isOpened()).isTrue()
+        assertThat(record.currentTrade.isOpened()).isTrue()
     }
 
     @Test
@@ -102,7 +102,7 @@ class TradingRecordTest {
         record.exit(2)
         record.closeCurrent()
         // then
-        assertThat(record.getCurrentTrade().isNew()).isTrue()
+        assertThat(record.currentTrade.isNew()).isTrue()
     }
 
     @Test(expected = IllegalStateException::class)
@@ -127,9 +127,9 @@ class TradingRecordTest {
         // when
         record.enter(5)
         // then
-        assertThat(record.getCurrentTrade().isNew()).isFalse()
+        assertThat(record.currentTrade.isNew()).isFalse()
         assertThat(record.getTradeCount()).isEqualTo(1)
-        assertThat(record.getTrades()[0].isClosed()).isTrue()
+        assertThat(record.trades[0].isClosed()).isTrue()
     }
 
     @Test
@@ -139,9 +139,9 @@ class TradingRecordTest {
         // when
         record.enter(5)
         // then
-        assertThat(record.getCurrentTrade().isNew()).isFalse()
+        assertThat(record.currentTrade.isNew()).isFalse()
         assertThat(record.getTradeCount()).isEqualTo(1)
-        assertThat(record.getTrades()[0].isClosed()).isTrue()
+        assertThat(record.trades[0].isClosed()).isTrue()
     }
 
     @Test
@@ -149,7 +149,7 @@ class TradingRecordTest {
         val record = BaseTradingRecord()
 
         record.enter(1)
-        assertThat(record.getCurrentTrade().isOpened()).isTrue()
+        assertThat(record.currentTrade.isOpened()).isTrue()
         assertThat(record.getTradeCount()).isZero()
         assertThat(record.getLastTrade()).isNull()
         assertThat(record.getLastOrder()).isEqualTo(Order.buyAt(1))
@@ -160,7 +160,7 @@ class TradingRecordTest {
 
         record.exit(3)
         record.enter(4)
-        assertThat(record.getCurrentTrade().isNew()).isFalse()
+        assertThat(record.currentTrade.isNew()).isFalse()
         assertThat(record.getTradeCount()).isOne()
         assertThat(record.getLastTrade()).isEqualTo(Trade(Order.buyAt(1), Order.sellAt(3)))
         assertThat(record.getLastOrder(SELL)).isEqualTo(Order.sellAt(3))
@@ -169,7 +169,7 @@ class TradingRecordTest {
         assertThat(record.getLastExit()).isEqualTo(Order.sellAt(3))
 
         record.enter(5)
-        assertThat(record.getCurrentTrade().isOpened()).isTrue()
+        assertThat(record.currentTrade.isOpened()).isTrue()
         assertThat(record.getTradeCount()).isOne()
         assertThat(record.getLastTrade()).isEqualTo(Trade(Order.buyAt(1), Order.sellAt(3)))
         assertThat(record.getLastOrder()).isEqualTo(Order.buyAt(5))

@@ -32,13 +32,14 @@ import java.util.*
 class BaseTradingRecord : TradingRecord {
 
     /** The recorded trades */
-    private val trades = ArrayList<Trade>()
+    override val trades = ArrayList<Trade>()
 
     /** The entry type (BUY or SELL) in the trading session */
     private val startingType: OrderType
 
     /** The current non-closed trade (there's always one) */
-    private var currentTrade: Trade
+    override var currentTrade: Trade
+    private set
 
     constructor() : this(OrderType.BUY)
 
@@ -70,8 +71,6 @@ class BaseTradingRecord : TradingRecord {
 
     private fun isEntry(order: Order) = order.type == startingType
 
-    override fun getCurrentTrade() = currentTrade
-
     override fun enter(index: Int, price: Decimal, amount: Decimal): Boolean {
         if (currentTrade.canBeClosed()) closeCurrent()
         currentTrade.enter(index, price, amount)
@@ -83,8 +82,6 @@ class BaseTradingRecord : TradingRecord {
         currentTrade.exit(index, price, amount)
         return true
     }
-
-    override fun getTrades() = trades
 
     override fun getLastOrder() = currentTrade.getLastOrder() ?: trades.lastOrNull()?.getLastOrder()
 

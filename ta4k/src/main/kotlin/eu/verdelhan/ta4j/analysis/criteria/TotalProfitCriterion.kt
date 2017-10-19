@@ -33,7 +33,7 @@ class TotalProfitCriterion : AbstractAnalysisCriterion() {
 
     override fun calculate(series: TimeSeries, tradingRecord: TradingRecord): Double {
         var value = 1.0
-        tradingRecord.getTrades().forEach { value *= calculateProfit(series, it) }
+        tradingRecord.trades.forEach { value *= calculateProfit(series, it) }
         return value
     }
 

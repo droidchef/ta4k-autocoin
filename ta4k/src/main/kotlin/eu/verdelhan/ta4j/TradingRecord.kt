@@ -37,27 +37,27 @@ import java.io.Serializable
  */
 interface TradingRecord : Serializable {
 
-    fun getCurrentTrade(): Trade
+    val currentTrade: Trade
 
     /**
      * @return true if current trade is closed, false otherwise
      */
-    fun isClosed() = getCurrentTrade().isClosed()
+    fun isClosed() = currentTrade.isClosed()
 
     /**
      * @return the recorded trades
      */
-    fun getTrades(): List<Trade>  // TODO rename to getClosedTrades
+    val trades: List<Trade>
 
     /**
      * @return the number of recorded trades
      */
-    fun getTradeCount() = getTrades().size // TODO rename to getClosedTradeCount
+    fun getTradeCount() = trades.size
 
     /**
      * @return the last trade recorded
      */
-    fun getLastTrade() = getTrades().lastOrNull() // TODO rename to getLastClosedTrade
+    fun getLastTrade() = trades.lastOrNull()
 
     /**
      * @return the last order recorded
